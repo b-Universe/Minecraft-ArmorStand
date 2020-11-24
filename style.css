@@ -106,7 +106,18 @@ input[type="text"]:not(:last-child){
 	text-align: right;
 	opacity: 0.6;
 }
-
+.script{
+	word-wrap: anywhere;
+	padding: 1em;
+	font-family: monospace;
+	background-color: #37474f;
+	border-radius: 3px;
+	color: #ffffff;
+}
+#codeblock{
+  background-color:#a8adaf;
+  display:inline-block;
+}
 #disabledslots{
 	display: block;
 }

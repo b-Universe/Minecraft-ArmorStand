@@ -133,6 +133,11 @@ $(document).ready(function(){
 		$("#code").selectAndCopyText();
 	});
 	
+	// Copy script on click
+	$(".script").click(function(){
+		$("#script").selectAndCopyText();
+	});
+
 	//Stuff to handle and update input
 	$("input").on("input", function(){
 		handleInput();
@@ -474,21 +479,6 @@ function updateUI(){
 	else
 		$("#disabledslots").slideUp();
 	
-	//Hide 1.13 features for 1.12 and lower.
-	switch (mcVersion) {
-		case "1.11":
-		case "1.9":
-		case "1.8":
-			$("#namecustomization").hide();
-			$("#centercorrected").hide();
-			break;
-		
-		default:
-			$("#namecustomization").show();
-			$("#centercorrected").show();
-			break;
-	}
-	
 	// Generate code
 	$("#code").text(generateCode());
 	// Show hint, when command is too long
@@ -500,7 +490,10 @@ function updateUI(){
 		$("#codeinfo").slideUp();
 	}
 
-
+	// Generate script
+	/** .replace(/\n/g, "<br />") */
+	$("#script").html(generateScript().replace(/\n/g, "<br>"));
+	
 	// Rotate 3D Stuff
 	// y and z rotation needs to be inverted
 	setRotation(mBody, body);
@@ -522,59 +515,106 @@ function updateUI(){
 	mBasePlate.visible = !noBasePlate;
 	mSkull.visible = equipHelmet != "";
 }
-
-function generateCode(){
-	var code = "/summon armor_stand ~ ~ ~ {" //in 1.13, positions are no longer center-corrected. Adding .5 makes it centered. However for players it is already center-corrected
-	
-	// Old entity name
-	if(mcVersion == "1.8" || mcVersion == "1.9"){
-		code = "/summon ArmorStand ~ ~ ~ {";
-	} else if (mcVersion == "1.11") {
-		code = "/summon armor_stand ~ ~ ~ {";
-	} else {
-		centercorrected ? code = "/summon armor_stand ~ ~-0.5 ~ {" : code = "/summon armor_stand ~ ~ ~ {"
-	}
+/** my_fancy_stick_man:\n&nbsp&nbsp&nbsp&nbsptype: entity\n&nbsp&nbsp&nbsp&nbspentity_type: armor_stand */
+function generateScript(){
+	var script = "my_fancy_stick_man:\n&nbsp&nbsp&nbsp&nbsptype: entity\n&nbsp&nbsp&nbsp&nbspentity_type: armor_stand\n&nbsp&nbsp&nbsp&nbsp"
 
 	var tags = [];
 
 	//CheckBoxes
 	if(invisible)
-		tags.push("Invisible:1b");
+		tags.push("visible: false");
 	if(invulnerable)
-		tags.push("Invulnerable:1b");
+		tags.push("invulnerable: true");
     if(persistencerequired)
-        tags.push("PersistenceRequired:1b");
+        tags.push("persistent: true");
 	if(noBasePlate)
-		tags.push("NoBasePlate:1b");
+		tags.push("base_plate: false");
 	if(noGravity)
-		tags.push("NoGravity:1b");
+		tags.push("gravity: false");
 	if(showArms)
-		tags.push("ShowArms:1b");
+		tags.push("arms: true");
 	if(small)
-		tags.push("Small:1b");
+		tags.push("small: true");
 	if(marker)
-		tags.push("Marker:1b");
+		tags.push("marker: true");
 
-	//Sliders
+	// Custom name
+	if(customName && showCustomName) {
+		let name = [];
+		name.push(getNameColor().replaceAll("\\", ""));
+		name.push(getNameBold().replaceAll("\\", ""));
+		name.push(getNameItalic().replaceAll("\\", ""));
+		name.push(getNameObfuscated().replaceAll("\\", ""));
+		name.push(getNameStrikethrough().replaceAll("\\", ""));
+		name.push(getName().replaceAll("\\", ""));
+		tags.push(`custom_name: ${name.join("")}`);
+	}
+		
+	if(showCustomName)
+		tags.push("custom_name_visible: true");
+
+	//DisabledSlots
+	if(useDisabledSlots){
+		tags.push("DisabledSlots: "+calculateDisabledSlotsFlag());
+	}
+
+	//Now the pose
+	var pose = [];
+	if(!isZero(body))
+		pose.push("body|"+getJSONArray(body));
+	if(!isZero(head))
+		pose.push("head|"+getJSONArray(head));
+	if(!isZero(leftLeg))
+		pose.push("left_leg|"+getJSONArray(leftLeg));
+	if(!isZero(rightLeg))
+		pose.push("right_leg|"+getJSONArray(rightLeg));
+	if(showArms){
+		if(!isZero(leftArm))
+			pose.push("left_arm|"+getJSONArray(leftArm));
+		if(!isZero(rightArm))
+			pose.push("right_arm|"+getJSONArray(rightArm));
+	}
+
+
+	if(pose.length > 0)
+		tags.push("armor_pose: "+pose.join("|"));
+
+	script += tags.join("\n&nbsp&nbsp&nbsp&nbsp");
+	return script;
+}
+
+function generateCode(){
+	var code = "/ex spawn <player.cursor_on.above> armor_stand["
+	
+	centercorrected ? code = "/ex spawn <player.cursor_on.center.above[0.5]> armor_stand[" : code = "/ex spawn <player.cursor_on.above> armor_stand["
+
+	var tags = [];
+
+	//CheckBoxes
+	if(invisible)
+		tags.push("visible=false");
+	if(invulnerable)
+		tags.push("invulnerable=true");
+    if(persistencerequired)
+        tags.push("persistent=true");
+	if(noBasePlate)
+		tags.push("base_plate=false");
+	if(noGravity)
+		tags.push("gravity=false");
+	if(showArms)
+		tags.push("arms=true");
+	if(small)
+		tags.push("small=true");
+	if(marker)
+		tags.push("marker=true");
+
+	/** //Sliders
 	if(rotation != 0)
-		tags.push("Rotation:["+rotation+"f]");
+		tags.push("Rotation:["+rotation+"f]"); /
 
-	// Equipment
+	/** // Equipment
 	if(useEquipment){
-		// Old 1.8 Equipment format
-		if(mcVersion == "1.8"){
-			var armor = [];
-
-			armor.push(getHandRightItem());
-			armor.push(getShoesItem());
-			armor.push(getLeggingsItem());
-			armor.push(getChestplateItem());
-			armor.push(getHeadItem());
-
-			tags.push("Equipment:["+armor.join(",")+"]");
-		}
-		// New 1.9+ Equipment format
-		else{
 			var armor = [];
 
 			armor.push(getShoesItem());
@@ -590,24 +630,14 @@ function generateCode(){
 			hands.push(getHandLeftItem());
 
 			tags.push("HandItems:["+hands.join(",")+"]");
-		}
 
 		// Hide netherite armour for lower versions
 		switch (mcVersion) {
 			case "1.14":
-			case "1.13":
 				$("#list-helmet").empty().append(helmetList.filter("[value!=netherite_helmet]"));
 				$("#list-chestplate").empty().append(chestplateList.filter("[value!=netherite_chestplate]"));
 				$("#list-leggings").empty().append(leggingsList.filter("[value!=netherite_leggings]"));
 				$("#list-shoes").empty().append(bootsList.filter("[value!=netherite_boots]"));
-				break;
-			case "1.11":
-			case "1.9":
-			case "1.8":
-				$("#list-helmet").empty().append(helmetList.filter("[value!=netherite_helmet]").filter("[value!=turtle_helmet]"));
-				$("#list-chestplate").empty().append(chestplateList.filter("[value!=netherite_chestplate]").filter("[value!=turtle_chestplate]"));
-				$("#list-leggings").empty().append(leggingsList.filter("[value!=netherite_leggings]").filter("[value!=turtle_leggings]"));
-				$("#list-shoes").empty().append(bootsList.filter("[value!=netherite_boots]").filter("[value!=turtle_boots]"));
 				break;
 			default:
 				$("#list-helmet").empty().append(helmetList);
@@ -616,73 +646,52 @@ function generateCode(){
 				$("#list-shoes").empty().append(bootsList);
 				break;
 		}
-	}
+	} */
 
 	// Custom name
-	if(customName) {
-		let name = [];
-		switch (mcVersion) {
-			case "1.8":
-			case "1.9":
-			case "1.11":
-				tags.push(`CustomName:"${customName}"`);
-				break;
-			case "1.13":
-				name.push(getName());
-				name.push(getNameColor());
-				name.push(getNameBold());
-				name.push(getNameItalic());
-				name.push(getNameObfuscated());
-				name.push(getNameStrikethrough());
-				
-				tags.push(`CustomName:"{${name.join("")}}"`);
-				break;
-			default:
-				// CustomNames from 1.14+ can now use single quotes to contain json
-				// Replace escaped double quotes with single quotes to make it look pretty				
-				name.push(getName().replaceAll("\\", ""));
-				name.push(getNameColor().replaceAll("\\", ""));
-				name.push(getNameBold().replaceAll("\\", ""));
-				name.push(getNameItalic().replaceAll("\\", ""));
-				name.push(getNameObfuscated().replaceAll("\\", ""));
-				name.push(getNameStrikethrough().replaceAll("\\", ""));
-				tags.push(`CustomName:'{${name.join("")}}'`);
-				break;
-		}
+	if(customName && showCustomName) {
+		let name = [];		
+		name.push(getNameColor().replaceAll("\\", ""));
+		name.push(getNameBold().replaceAll("\\", ""));
+		name.push(getNameItalic().replaceAll("\\", ""));
+		name.push(getNameObfuscated().replaceAll("\\", ""));
+		name.push(getNameStrikethrough().replaceAll("\\", ""));
+		name.push(getName().replaceAll("\\", ""));
+		tags.push(`custom_name=${name.join("")}`);
 	}
 		
 	if(showCustomName)
-		tags.push("CustomNameVisible:1b");
+		tags.push("custom_name_visible=true");
 
 	//DisabledSlots
 	if(useDisabledSlots){
-		tags.push("DisabledSlots:"+calculateDisabledSlotsFlag());
+		tags.push("DisabledSlots="+calculateDisabledSlotsFlag());
 	}
 
 	//Now the pose
 	var pose = [];
 	if(!isZero(body))
-		pose.push("Body:"+getJSONArray(body));
+		pose.push("body|"+getJSONArray(body));
 	if(!isZero(head))
-		pose.push("Head:"+getJSONArray(head));
+		pose.push("head|"+getJSONArray(head));
 	if(!isZero(leftLeg))
-		pose.push("LeftLeg:"+getJSONArray(leftLeg));
+		pose.push("left_leg|"+getJSONArray(leftLeg));
 	if(!isZero(rightLeg))
-		pose.push("RightLeg:"+getJSONArray(rightLeg));
+		pose.push("right_leg|"+getJSONArray(rightLeg));
 	if(showArms){
 		if(!isZero(leftArm))
-			pose.push("LeftArm:"+getJSONArray(leftArm));
+			pose.push("left_arm|"+getJSONArray(leftArm));
 		if(!isZero(rightArm))
-			pose.push("RightArm:"+getJSONArray(rightArm));
+			pose.push("right_arm|"+getJSONArray(rightArm));
 	}
 
 
 	if(pose.length > 0)
-		tags.push("Pose:{"+pose.join(",")+"}");
+		tags.push("armor_pose="+pose.join("|"));
 
-	code += tags.join(",");
-	code += "}";
-	return code;
+	code += tags.join(";");
+	code += "]";
+	return [code];
 }
 
 function getHandRightItem(){
@@ -741,11 +750,6 @@ function getHeadItem(){
 		var base64Value = btoa('{"textures":{"SKIN":{"url":"'+equipHelmet+'"}}}');
 		
 		switch (mcVersion) {
-			case "1.8":
-			case "1.9":
-			case "1.11":
-				return '{id:"skull",Count:1b,Damage:3b,tag:{SkullOwner:{Id:"'+generateUUID()+'",Properties:{textures:[{Value:"'+base64Value+'"}]}}}}';
-			case "1.13":
 			case "1.14":
 				return '{id:"minecraft:player_head",Count:1b,tag:{SkullOwner:{Id:"'+generateUUID()+'",Properties:{textures:[{Value:"'+base64Value+'"}]}}}}';
 			default:
@@ -786,11 +790,7 @@ function getHeadItem(){
 		else{
 			var skullOwnerRaw = equipHelmet.substring(equipHelmet.indexOf("SkullOwner:"));
 			skullOwnerRaw = skullOwnerRaw.substring(0, skullOwnerRaw.indexOf("}"));
-			if (mcVersion == "1.8" || mcVersion == "1.10" || mcVersion == "1.11") {
-				return '{id:"skull",Count:1b,Damage:3b,tag:{'+skullOwnerRaw+'}}';
-			} else {
-				return '{id:"player_head",Count:1b,tag:{'+skullOwnerRaw+'}}';
-			}
+			return '{id:"player_head",Count:1b,tag:{'+skullOwnerRaw+'}}';
 		}
 
 	}
@@ -799,32 +799,32 @@ function getHeadItem(){
 
 function getName() {
 	if (!customName) return ""
-	return `\\"text\\":\\"${customName}\\"`
+	return `${customName}`
 }
 
 function getNameColor() {
 	if (nameColor == "") return ""
-	return `,\\"color\\":\\"${nameColor}\\"`
+	return `<${nameColor}>`
 }
 
 function getNameBold() {
 	if (!nameBold) return ""
-	return `,\\"bold\\":\\"true\\"`
+	return `<bold>`
 }
 
 function getNameItalic() {
 	if (!nameItalic) return ""
-	return `,\\"italic\\":\\"true\\"`
+	return `<italic>`
 }
 
 function getNameStrikethrough() {
 	if (!nameStrikethrough) return ""
-	return `,\\"strikethrough\\":\\"true\\"`
+	return `<strikethrough>`
 }
 
 function getNameObfuscated() {
 	if (!nameObfuscated) return ""
-	return `,\\"obfuscated\\":\\"true\\"`
+	return `<obfuscated>`
 }
 
 function calculateDisabledSlotsFlag() {
@@ -860,7 +860,7 @@ function isZero(vector){
 	return vector.x == 0 && vector.y == 0 && vector.z == 0;
 }
 function getJSONArray(vector){
-	return "["+vector.x+"f,"+vector.y+"f,"+vector.z+"f]";
+	return +getRadian(vector.x)+","+getRadian(vector.y)+","+getRadian(vector.z);
 }
 
 function getMouseDeltaX(){
@@ -890,7 +890,12 @@ function render(){
 }
 
 
-
+// ---- mahth
+function getRadian(degrees)
+{
+  var pi = Math.PI;
+  return Math.round(degrees * (pi/180) * 100) / 100;
+}
 
 // ---- Additional functions
 

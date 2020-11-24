@@ -31,9 +31,12 @@
         <div class="padding underline">
             <h1>MINECRAFT ARMOR STAND</h1>
             <center>
-                <a href="https://github.com/haselkern/Minecraft-ArmorStand" target="_blank"><img src="images/github.png" alt="GitHub" title="GitHub" /></a>
-                <a href="https://www.twitter.com/haselcode" target="_blank"><img src="images/twitter.png" alt="Twitter" title="Twitter" /></a>
-                <a href="https://haselkern.com/armorstand" target="_blank"><img src="images/help.png" alt="haselkern.com/armorstand" title="help" /></a>
+                <a href="https://github.com/haselkern/Minecraft-ArmorStand" target="_blank"><img src="https://avatars0.githubusercontent.com/u/7420740?s=460&u=157a7adca97e2c9402ba7fea610acadbcd11196f&v=4" alt="haselkern.com/armorstand" title="haselkern GitHub" width="64"/></a>
+                <a href="https://github.com/bGielinor/Minecraft-ArmorStand" target="_blank"><img src="https://avatars0.githubusercontent.com/u/71407373?s=200&v=4" alt="bGielinor/Minecraft-ArmorStand" title="bGielinor GitHub" width="64"/></a>
+            </center>
+            <br>
+            <center>
+                Fork of haselkern/Minecraft-ArmorStand by Bear for Denizen
             </center>
         </div>
 
@@ -41,10 +44,6 @@
             <select id="mcversion">
 				<option value="1.16">Minecraft 1.16 and above</option>
 				<option value="1.14">Minecraft 1.14 &amp; 1.15</option>
-				<option value="1.13">Minecraft 1.13</option>
-                <option value="1.11">Minecraft 1.11 &amp; 1.12</option>
-                <option value="1.9">Minecraft 1.9 &amp; 1.10</option>
-                <option value="1.8">Minecraft 1.8</option>
             </select>
         </div>
 
@@ -67,7 +66,6 @@
                 <tr>
                     <td>Rotation:</td>
                     <td colspan="3"><input type="range" name="rotation" min="0" max="360" value="0"></td>
-                </tr>
                 <tr>
                     <td>Head:</td>
                     <td><input type="range" name="headX" min="0" max="360" value="0"></td>
@@ -112,7 +110,9 @@
         </div>
 
         <div class="padding underline">
+            <!-- hidden until maybe the dawn of time or so idk
             <label><input type="checkbox" name="useequipment">Enable equipment</label><br>
+            --->
             <div id="customequipment">
                 <p>
                     Enter the text id of an item (for example <i>stone</i> or <i>iron_sword</i>) into the appropriate slots. You can enter an arbitrary item for the head or hand, but the other slots must contain an appropriate item.
@@ -187,10 +187,6 @@
             <input type="text" name="customname" id="customname" placeholder="Custom name">
             <label><input type="checkbox" name="showcustomname">Show custom name</label><br>
 			<div id="namecustomization">
-				<p>
-					In 1.13, you can now add formats to the name tags.
-					Enter the color id (for example red, dark_blue) in the name color field to give it a color.
-				</p>
 				<input type="text" name="namecolor" id="namecolor" placeholder="Name color" list="list-colors">
 				<datalist id="list-colors">
 					<option value="aqua">
@@ -269,7 +265,7 @@
         </div>
         <div id="codeinfo" class="padding">
             <b>Please note:</b>
-            This command is too long to be executed from chat. You need to place it inside a command block. (see below)
+            This command is too long to be executed from chat. You need to place it inside script or from the console. (see below)
         </div>
 
     </div>
@@ -303,15 +299,23 @@
 
     <div class="right card">
         <span style="cursor: pointer;" onclick="javascript:$('#getcommandblock').slideToggle();">
-            + Obtain a command block
+            + Denizen Entity Script Container
         </span>	
         <br>
         <div id="getcommandblock">
             <div class="padding">
-                If your command is longer than 256 characters (100 before Minecraft 1.11), it needs to be executed with a <i>command block</i>. Obtain one by typing:
+                If your command exceeds 256 characters, it needs to be executed with a script or from the console.
+                You can place the entity script container below by using the command:<br>
+                <span id="codeblock">/ex spawn my_fancy_stick_man &ltplayer.location&gt</span>
             </div>
-            <div class="code">
-                /give @p minecraft:command_block
+
+            <div class="script">
+                <div id="script"></div>
+            <!--
+                task:<br>
+                &nbsp&nbsptype: task<br>
+                &nbsp&nbspscript:<br>
+                &nbsp&nbsp&nbsp&nbsp- &ltcommand&gt-->
             </div>
         </div>
     </div>
