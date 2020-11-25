@@ -509,7 +509,7 @@ function updateUI(){
 	mBasePlate.visible = !noBasePlate;
 	mSkull.visible = equipHelmet != "";
 }
-/** my_fancy_stick_man:\n&nbsp&nbsp&nbsp&nbsptype: entity\n&nbsp&nbsp&nbsp&nbspentity_type: armor_stand */
+
 function generateScript(){
 	var script = "my_fancy_stick_man:\n&nbsp&nbsp&nbsp&nbsptype: entity\n&nbsp&nbsp&nbsp&nbspentity_type: armor_stand\n&nbsp&nbsp&nbsp&nbsp"
 
@@ -579,9 +579,9 @@ function generateScript(){
 }
 
 function generateCode(){
-	var code = "/ex spawn <player.cursor_on.above> \"armor_stand["
+	var code = "/ex spawn <player.cursor_on.above> "
 	
-	centercorrected ? code = "/ex spawn <player.cursor_on.center.above[0.5]> \"armor_stand[" : code = "/ex spawn <player.cursor_on.above> \"armor_stand["
+	centercorrected ? code = "/ex spawn <player.cursor_on.center.above[0.5]> " : code = "/ex spawn <player.cursor_on.above> "
 
 	var tags = [];
 
@@ -653,7 +653,7 @@ function generateCode(){
 		name.push(getName().replaceAll("\\", ""));
 		tags.push(`custom_name=${name.join("")}`);
 	}
-		
+
 	if(showCustomName)
 		tags.push("custom_name_visible=true");
 
@@ -683,8 +683,19 @@ function generateCode(){
 	if(pose.length > 0)
 		tags.push("armor_pose="+pose.join("|"));
 
-	code += tags.join(";");
-	code += "]\"";
+		if(tags.join().indexOf(" ") >= 0){
+			code += "\"armor_stand"
+		} else{
+			code += "armor_stand"
+		}
+
+	if(!arrayIsEmpty(tags))
+		if(tags.join().indexOf(" ") >= 0){
+			code += "["+tags.join(";")+"]\""
+		} else{
+			code += "["+tags.join(";")+"]"
+		}
+
 	return code;
 }
 
@@ -742,7 +753,7 @@ function getHeadItem(){
 	// Best reference: http://redd.it/24quwx
 	else if(equipCustomHeadMode == "url"){
 		var base64Value = btoa('{"textures":{"SKIN":{"url":"'+equipHelmet+'"}}}');
-		
+
 		switch (mcVersion) {
 			case "1.14":
 				return '{id:"minecraft:player_head",Count:1b,tag:{SkullOwner:{Id:"'+generateUUID()+'",Properties:{textures:[{Value:"'+base64Value+'"}]}}}}';
@@ -753,7 +764,7 @@ function getHeadItem(){
 
 	// Parse give code
 	else if(equipCustomHeadMode == "givecode"){
-		
+
 		// Give Code in this format: /give @p skull 1 3 {display:{Name:"Some Name"},SkullOwner:{Id:"a74719ce...
 		// Give code in 1.13 has changed to this format: /give @p player_head{display:{Name:"Some Name"},SkullOwner:{Id:"a74719ce...
 		if(equipHelmet.indexOf("SkullOwner:{") >= 0){
@@ -772,7 +783,7 @@ function getHeadItem(){
 				if(bracketCounter == 0 && bracketsStarted) break;
 				if(c == ":") bracketsStarted = true;
 			}
-			
+
 			if (mcVersion == "1.8" || mcVersion == "1.10" || mcVersion == "1.11") {
 				return '{id:"skull",Count:1b,Damage:3b,tag:{'+parsed+'}}';
 			} else {
@@ -883,7 +894,6 @@ function render(){
 	requestAnimationFrame(render);
 }
 
-
 // ---- mahth
 function getRadian(degrees)
 {
@@ -891,6 +901,18 @@ function getRadian(degrees)
   return Math.round(degrees * (pi/180) * 100) / 100;
 }
 
+function hasSpaces(value){
+	return value.indexOf(' ') >= 0;
+}
+function arrayIsEmpty(array){
+	if(!Array.isArray(array)){
+			return true;
+	}
+	if(array.length == 0){
+			return true;
+	}
+	return false;
+}
 // ---- Additional functions
 
 // From here: http://stackoverflow.com/a/8809472/1456971
