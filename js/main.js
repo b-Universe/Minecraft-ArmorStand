@@ -415,13 +415,7 @@ function updateUI(){
 
 	if(useEquipment){
 		$("#customequipment").slideDown();
-		// Hide left hand item input for minecraft 1.8
-		if(mcVersion == "1.8"){
-			$("#equipHandLeft").hide();
-		}
-		else{
-			$("#equipHandLeft").show();
-		}
+		$("#equipHandLeft").show();
 	}
 	else
 		$("#customequipment").slideUp();
@@ -556,7 +550,7 @@ function generateScript(){
 
 	//DisabledSlots
 	if(useDisabledSlots){
-		tags.push("DisabledSlots: "+calculateDisabledSlotsFlag());
+		tags.push("disabled_slots_raw: "+calculateDisabledSlotsFlag());
 	}
 
 	//Now the pose
@@ -585,9 +579,9 @@ function generateScript(){
 }
 
 function generateCode(){
-	var code = "/ex spawn <player.cursor_on.above> armor_stand["
+	var code = "/ex spawn <player.cursor_on.above> \"armor_stand["
 	
-	centercorrected ? code = "/ex spawn <player.cursor_on.center.above[0.5]> armor_stand[" : code = "/ex spawn <player.cursor_on.above> armor_stand["
+	centercorrected ? code = "/ex spawn <player.cursor_on.center.above[0.5]> \"armor_stand[" : code = "/ex spawn <player.cursor_on.above> \"armor_stand["
 
 	var tags = [];
 
@@ -665,7 +659,7 @@ function generateCode(){
 
 	//DisabledSlots
 	if(useDisabledSlots){
-		tags.push("DisabledSlots="+calculateDisabledSlotsFlag());
+		tags.push("disabled_slots_raw="+calculateDisabledSlotsFlag());
 	}
 
 	//Now the pose
@@ -690,8 +684,8 @@ function generateCode(){
 		tags.push("armor_pose="+pose.join("|"));
 
 	code += tags.join(";");
-	code += "]";
-	return [code];
+	code += "]\"";
+	return code;
 }
 
 function getHandRightItem(){
