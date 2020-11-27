@@ -3,6 +3,10 @@ html, body{
 	font-family: Arial, sans-serif;
 	margin: 0;
 	padding: 0;
+	color: #ffffff;
+}
+.wrong{
+	color: #000000;
 }
 
 canvas{
@@ -12,6 +16,9 @@ canvas{
 }
 
 body{
+	background-color: #2f3136;
+}
+.wrong{
 	background-color: #dddddd;
 }
 
@@ -27,6 +34,9 @@ h1{
 }
 
 a{
+	color: #ffffff;
+}
+.wrong{
 	color: #000000;
 }
 
@@ -72,7 +82,7 @@ input[type="text"]:not(:last-child){
 }
 
 .card{
-	background-color: #ffffff;
+	background-color: #23272a;
 	box-shadow: 0 2px 4px #555555;
 	margin: 0.5em;
 	border-radius: 3px;
@@ -88,6 +98,9 @@ input[type="text"]:not(:last-child){
 }
 
 .underline{
+	border-bottom: 1px dashed #99aab5;
+}
+.wrong{
 	border-bottom: 1px dashed #ddd;
 }
 
@@ -112,10 +125,11 @@ input[type="text"]:not(:last-child){
 	font-family: monospace;
 	background-color: #37474f;
 	border-radius: 3px;
-	color: #ffffff;
+	color: #EEEEFF;
 }
 #codeblock{
-  background-color:#a8adaf;
+  background-color:#37474f;
+	color: #EEEEFF;
   display:inline-block;
 }
 #disabledslots{

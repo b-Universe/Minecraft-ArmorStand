@@ -645,12 +645,12 @@ function generateCode(){
 	// Custom name
 	if(customName && showCustomName) {
 		let name = [];		
-		name.push(getNameColor().replaceAll("\\", ""));
-		name.push(getNameBold().replaceAll("\\", ""));
-		name.push(getNameItalic().replaceAll("\\", ""));
-		name.push(getNameObfuscated().replaceAll("\\", ""));
-		name.push(getNameStrikethrough().replaceAll("\\", ""));
-		name.push(getName().replaceAll("\\", ""));
+		name.push(getNameColor());
+		name.push(getNameBold());
+		name.push(getNameItalic());
+		name.push(getNameObfuscated());
+		name.push(getNameStrikethrough());
+		name.push(getName());
 		tags.push(`custom_name=${name.join("")}`);
 	}
 
