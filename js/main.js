@@ -511,7 +511,7 @@ function updateUI(){
 }
 
 function generateScript(){
-	var script = "my_fancy_stick_man:\n&nbsp&nbsp&nbsp&nbsptype: entity\n&nbsp&nbsp&nbsp&nbspentity_type: armor_stand\n&nbsp&nbsp&nbsp&nbsp"
+	var script = "my_fancy_stick_man:\n&nbsp&nbsp&nbsp&nbsptype: entity\n&nbsp&nbsp&nbsp&nbspentity_type: armor_stand\n"
 
 	var tags = [];
 
@@ -574,7 +574,10 @@ function generateScript(){
 	if(pose.length > 0)
 		tags.push("armor_pose: "+pose.join("|"));
 
-	script += tags.join("\n&nbsp&nbsp&nbsp&nbsp");
+	if(tags.length > 0)
+	  tags.unshift("&nbsp&nbsp&nbsp&nbspmechanisms:");
+
+	script += tags.join("\n&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp");
 	return script;
 }
 
@@ -1014,12 +1017,12 @@ function saveData() {
 			head: [getRangeInput("headX"), getRangeInput("headY"), getRangeInput("headZ")],
 			body: [getRangeInput("bodyX"), getRangeInput("bodyY"), getRangeInput("bodyZ")],
 			legs: {
-				left: [getRangeInput("leftLegX"), getRangeInput("leftLegY"), getRangeInput("leftLegX")],
+				left: [getRangeInput("leftLegX"), getRangeInput("leftLegY"), getRangeInput("leftLegZ")],
 				right: [getRangeInput("rightLegX"), getRangeInput("rightLegY"), getRangeInput("rightLegZ")],
 			},
 			arms: {
-				left: [getRangeInput("leftArmX"), getRangeInput("leftArmY"), getRangeInput("leftArmX")],
-				right: [getRangeInput("rightArmX"), getRangeInput("rightArmY"), getRangeInput("rightArmX")]
+				left: [getRangeInput("leftArmX"), getRangeInput("leftArmY"), getRangeInput("leftArmZ")],
+				right: [getRangeInput("rightArmX"), getRangeInput("rightArmY"), getRangeInput("rightArmZ")]
 			}
 		},
 	
